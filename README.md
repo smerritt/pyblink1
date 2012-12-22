@@ -1,7 +1,7 @@
 pyblink1
 ========
 
-pyblink1 is a Python binding for the
+pyblink1 is a Python library for the
 [blink(1)](http://blink1.thingm.com) USB RGB LED.
 
 Example
