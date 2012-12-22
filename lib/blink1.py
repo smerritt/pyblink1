@@ -38,7 +38,7 @@ class Blink1(object):
     def __init__(self, usbdev):
         self.usbdev = usbdev
 
-    def setrgb(self, r, g, b):
+    def set_rgb(self, r, g, b):
         """
         Set this blink(1) to a specific RGB value.
 
@@ -52,11 +52,11 @@ class Blink1(object):
             BLINK1_REPORT_ID,
             ord('n'),          # command code: 'set rgb now'
             r, g, b,           # the actual color
-            0, 0, 0, 0)        # padding?
+            0, 0, 0, 0)        # padding
 
         self._send_message(message)
 
-    def fadergb(self, duration, r, g, b):
+    def fade_rgb(self, duration, r, g, b):
         """
         Fade this blink(1) to a specific RGB value.
 
@@ -71,7 +71,7 @@ class Blink1(object):
 
         """
         if duration <= 0:
-            return self.setrgb(r, g, b)
+            return self.set_rgb(r, g, b)
 
         # Apparently the device wants centiseconds, and it wants them
         # in a 16-bit unsigned integer.
@@ -150,5 +150,5 @@ class Blink1(object):
 
 if __name__ == '__main__':
     dev = find()[0]
-    dev.setrgb(200,0,0)
-    dev.fadergb(2.0, 0, 200, 0)
+    dev.set_rgb(200,0,0)
+    dev.fade_rgb(2.0, 0, 200, 0)
