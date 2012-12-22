@@ -21,3 +21,7 @@ Requirements
 ============
  - pyusb >= 1.0.0
  - probably has to run with root privileges on Linux in order to send raw USB messages
+
+License
+=======
+[Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
