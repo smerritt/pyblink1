@@ -20,6 +20,7 @@ led.fade_rgb(2.5, 200, 100, 0)   # fade to yellow over 2.5 seconds
 Requirements
 ============
  - pyusb >= 1.0.0
+ - a pyusb backend such as libusb or openusb
  - probably has to run with root privileges on Linux in order to send raw USB messages
 
 License
