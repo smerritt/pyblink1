@@ -71,7 +71,7 @@ class Blink1(object):
 
         """
         if duration <= 0:
-            return self.set_rgb(color)
+            return self.set_rgb(rgb_color)
 
         r, g, b = rgb_color
 
