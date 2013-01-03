@@ -34,6 +34,13 @@ def find():
                           find_all=True)]
 
 
+# from https://github.com/todbot/blink1/blob/master/commandline/blink1-lib.c
+# a simple logarithmic -> linear mapping as a sort of gamma correction
+# maps from 0-255 to 0-255
+def _degamma(n):
+    return (((1<<(n/32))-1) + ((1<<(n/32))*((n%32)+1)+15)/32)
+
+
 class Blink1(object):
     def __init__(self, usbdev):
         self.usbdev = usbdev
@@ -46,7 +53,7 @@ class Blink1(object):
                           0 and 255, inclusive.
         """
 
-        r, g, b = rgb_color
+        r, g, b = (_degamma(x) for x in rgb_color)
 
         message = struct.pack(
             'BBBBBBBBB',
@@ -71,9 +78,9 @@ class Blink1(object):
 
         """
         if duration <= 0:
-            return self.set_rgb(color)
+            return self.set_rgb(rgb_color)
 
-        r, g, b = rgb_color
+        r, g, b = (_degamma(x) for x in rgb_color)
 
         duration = self._normalize_duration(duration)
 
@@ -131,7 +138,7 @@ class Blink1(object):
                          value is 655.35.
         """
         duration = self._normalize_duration(duration)
-        r, g, b = rgb_color
+        r, g, b = (_degamma(x) for x in rgb_color)
         message = struct.pack(
             'BBBBBBBBB',
             BLINK1_REPORT_ID,
