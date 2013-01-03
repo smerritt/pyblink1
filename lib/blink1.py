@@ -45,6 +45,12 @@ class Blink1(object):
     def __init__(self, usbdev):
         self.usbdev = usbdev
 
+    def off(self):
+        """
+        Turn the light off.
+        """
+        self.set_rgb((0,0,0))
+
     def set_rgb(self, rgb_color):
         """
         Set this blink(1) to a specific RGB value.
