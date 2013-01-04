@@ -116,14 +116,12 @@ class Blink1(object):
             0, 0, 0, 0, 0, 0)    # padding
         self._send_message(message)
 
-
     def stop(self):
         """
         Stop playback of the blink(1)'s internal pattern buffer.
 
         """
         self.play(False)
-
 
     def write_pattern_line(self, pos, rgb_color, duration=2):
         """
@@ -218,9 +216,6 @@ class Blink1(object):
 
             # The 9-byte message.
             message)
-
-        # wave a dead chicken over it
-        usb.util.dispose_resources(self.usbdev)
 
 
 if __name__ == '__main__':
