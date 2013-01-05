@@ -123,7 +123,7 @@ class Blink1(object):
         """
         self.play(False)
 
-    def write_pattern_line(self, pos, rgb_color, duration=2):
+    def write_pattern_line(self, pos, rgb_color, duration=2, degamma=True):
         """
         Write a pattern line to the blink(1)'s internal pattern buffer.
 
@@ -142,7 +142,10 @@ class Blink1(object):
                          value is 655.35.
         """
         duration = self._normalize_duration(duration)
-        r, g, b = (_degamma(x) for x in rgb_color)
+        r, g, b = rgb_color
+        if degamma:
+            r, g, b = _degamma(r), _degamma(g), _degamma(b)
+
         message = struct.pack(
             'BBBBBBBBB',
             BLINK1_REPORT_ID,
@@ -153,6 +156,57 @@ class Blink1(object):
             pos,                 # position to write
             0)                   # padding
         self._send_message(message)
+
+    def set_pattern(self, pattern):
+        """
+        Write a repeating pattern to the blink(1)'s internal pattern buffer.
+
+        The pattern is a sequence of between 2 and 12 (inclusive)
+        pattern specifiers that make up a pattern that will repeat.
+
+        Each specifier is a 2-tuple (time, (r, g, b)). <time> is how
+        long, in seconds, to take when fading to the color (r, g, b).
+
+        The pattern buffer has 12 positions, each containing:
+          - an RGB color
+          - a duration
+
+        This method simply sets the pattern; it does not play it. Call
+        .play() to begin playback.
+
+        """
+        if len(pattern) < 2 or len(pattern) > 12:
+            raise ValueError(
+                "Pattern length must be between 2 and 12; was %d"
+                % len(pattern))
+
+        pattern = [(tp[0], tuple(_degamma(c) for c in tp[1]))
+                    for tp in pattern]
+
+        interpolated = []
+        if len(pattern) < 12:
+            npoints = 12 - len(pattern) + 2
+            duration = float(pattern[-1][0]) / npoints
+
+            left_color = pattern[-2][1]
+            right_color = pattern[-1][1]
+
+            for i in xrange(1, npoints):
+                color = []
+                for j in xrange(len(left_color)):
+                    left = float(left_color[j])
+                    right = float(right_color[j])
+                    # assume the points are x-distance 1 apart; it
+                    # comes out in the wash
+                    color.append(int(left + (right - left)*i/npoints))
+                interpolated.append((duration, tuple(color)))
+
+            pattern = list(pattern[0:-1])
+            pattern.append(interpolated.pop(0))
+
+        for i, pattern_specifier in enumerate(pattern + interpolated):
+            duration, color = pattern_specifier
+            self.write_pattern_line(i, color, duration, degamma=False)
 
     def _normalize_duration(self, raw_duration):
         """
@@ -220,5 +274,7 @@ class Blink1(object):
 
 if __name__ == '__main__':
     dev = find()[0]
-    dev.set_rgb((200,0,0))
-    dev.fade_rgb((0, 200, 0), 2.0)
+    dev.set_pattern([(1, (255, 0,   0)),
+                     (1, (0,   255, 0)),
+                     (1, (0,   0,   255))])
+    dev.play()
