@@ -15,10 +15,10 @@ led = devices[0]
 led.set_rgb((100, 0, 100))         # set to purple
 led.fade_rgb((200, 100, 0), 2.5)   # fade to yellow over 2.5 seconds
 
-led.write_pattern_line(0, (255, 0, 0), 1.5)  # set pattern 0 to fade to red over 1.5s
-led.write_pattern_line(1, (255, 0, 0))       # set pattern 1 to fade to green over 2s
+led.set_pattern([(0.25, (255, 0, 0)), # quickly to red
+                 (2, (0, 255, 0))])   # slowly to green
 
-led.play()      # play internal pattern
+led.play()      # play internal pattern (set by set_pattern)
 led.stop()      # stop playing internal pattern
 ```
 
