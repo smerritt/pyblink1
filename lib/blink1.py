@@ -241,7 +241,7 @@ class Blink1(object):
         try:
             # On Linux, you have to attach to the interface after you
             # detach the kernel driver.
-            self.usbdev._ctx.managed_claim_interface(self.usbdev, 0)
+            usb.util.claim_interface(self.usbdev, 0)
         except usb.core.USBError:
             # On non-Linux, this just raises an error.
             pass
