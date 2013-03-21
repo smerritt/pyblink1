@@ -49,6 +49,7 @@ class Blink1(object):
         """
         Turn the light off.
         """
+        self.stop()
         self.set_rgb((0,0,0))
 
     def set_rgb(self, rgb_color):
