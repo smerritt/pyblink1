@@ -246,27 +246,28 @@ class Blink1(object):
             # On non-Linux, this just raises an error.
             pass
 
-        self.usbdev.ctrl_transfer(
-            # TYPE_CLASS: class-specific request. That is, we're
+        request_type = usb.util.build_request_type(
+            # CTRL_OUT: message going out from us (the host) to the
+            # device
+            usb.util.CTRL_OUT,
+            # CTRL_TYPE_CLASS: class-specific request. That is, we're
             # making a request that is specific to the class of the
             # device (for us, HID), not a standard
             # all-devices-must-support-it request.
-            #
-            # RECIP_INTERFACE: send it to, uh, the recipient's, um...
-            # interface? maybe?
-            #
-            # ENDPOINT_OUT: this is the standard endpoint that control
-            # messages go to.
-            usb.TYPE_CLASS | usb.RECIP_INTERFACE | usb.ENDPOINT_OUT,
-
-            # (3 << 8) == HID setreport (send data to device)
-            # not sure why the report ID ends up in here twice, though
-            (3 << 8) | BLINK1_REPORT_ID,
-
+            usb.util.CTRL_TYPE_CLASS,
+            # CTRL_RECIP_DEVICE: send it to the device, not one of its
+            # interfaces. While this does seem to work sometimes with
+            # CTRL_RECIPIENT_INTERFACE, using that seems to result in more
+            # random USBErrors w/errno=32 (pipe error), at least on my
+            # macbook.
+            usb.util.CTRL_RECIPIENT_DEVICE)
+        self.usbdev.ctrl_transfer(
+            request_type,
+            0x09,  # HID SET_REPORT command
             # wValue, wIndex: "Use varies according to request",
-            # according to <http://www.usbmadesimple.co.uk/ums_4.htm>.
+            # according to the official spec.
             #
-            # Evidently, this request wants zeros.
+            # This request wants zeros.
             0, 0,
 
             # The 9-byte message.
